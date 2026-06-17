@@ -1,32 +1,45 @@
 import { ReactNode } from "react";
 
 /**
- * Black topbar (structural chrome per design.md). The Nahdi wordmark is dark
- * teal, so each logo sits on a white chip to stay legible on black.
- * Nahdi (client) leads on the left; Initiative (agency) on the right.
+ * White brand bar serving as the page header. Nahdi (client) sits to the left
+ * of the title; Initiative (agency) on the far right. On white both logos read
+ * without the chips the previous black topbar required.
  */
-export default function Header({ right }: { right?: ReactNode }) {
+export default function Header({
+  title = "Product Verification",
+  subtitle,
+  right,
+}: {
+  title?: string;
+  subtitle?: string;
+  right?: ReactNode;
+}) {
   return (
-    <header className="topbar">
-      <div className="logo-chip">
+    <header className="brandbar">
+      <div className="brand-left">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logos/nahdi_online_logo.png"
           alt="Nahdi Online"
-          style={{ height: 34 }}
+          className="brand-logo"
+          style={{ height: 40 }}
         />
+        <span className="brand-divider" />
+        <div className="min-w-0">
+          <h1 className="sec-hdr">{title}</h1>
+          {subtitle && <p className="brand-sub">{subtitle}</p>}
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="brand-right">
         {right}
-        <div className="logo-chip">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logos/Initiative_agency_logo.png"
-            alt="Initiative"
-            style={{ height: 24 }}
-          />
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logos/Initiative_agency_logo.png"
+          alt="Initiative"
+          className="brand-logo"
+          style={{ height: 26 }}
+        />
       </div>
     </header>
   );

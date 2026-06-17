@@ -23,8 +23,10 @@ export default async function LoginPage({
       <Header />
       <div className="flex flex-1 items-center justify-center p-4">
         <div className="panel w-full max-w-sm">
-          <h1 className="sec-hdr">Product Verification</h1>
-          <p className="mt-2 mb-6 text-sm text-[var(--mid-gray)]">
+          <div className="ph">
+            <h2>Sign In</h2>
+          </div>
+          <p className="mb-6 text-sm text-[var(--mid-gray)]">
             Sign in with your Google account to access the dashboard.
           </p>
 

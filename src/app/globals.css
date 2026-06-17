@@ -48,35 +48,49 @@ body {
 }
 
 /* ============================================================
-   Topbar (structural chrome — sharp corners, black)
+   Brand bar (white header — Nahdi left, Initiative right)
    ============================================================ */
-.topbar {
-  height: var(--topbar-h);
-  background: var(--black);
+.brandbar {
+  min-height: var(--topbar-h);
+  background: var(--white);
+  border-bottom: 1px solid var(--light-gray);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--page-pad);
+  gap: 16px;
+  padding: 12px var(--page-pad);
+}
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+.brand-right {
+  display: flex;
+  align-items: center;
   gap: 16px;
 }
-
-/* White chip so logos stay legible on black */
-.logo-chip {
-  display: inline-flex;
-  align-items: center;
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 6px 12px;
+.brand-divider {
+  width: 1px;
+  height: 38px;
+  background: var(--light-gray);
+  flex: none;
 }
-.logo-chip img {
+.brand-logo {
   display: block;
   width: auto;
+  flex: none;
 }
-
+.brand-sub {
+  font-size: 11px;
+  color: var(--mid-gray);
+  margin-top: 2px;
+}
 .topbar-meta {
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: #cfcfcf;
+  color: var(--mid-gray);
 }
 
 /* ============================================================
