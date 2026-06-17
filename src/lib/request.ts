@@ -3,9 +3,16 @@ import { getSession } from "@/lib/session";
 import { ALL_FEED_KEYS, FeedKey, getFeeds, isFeedKey } from "@/lib/feeds";
 import { parseIds, searchFeeds, SearchResult } from "@/lib/match";
 
+export type StatusFilter = "all" | "available" | "not_found";
+
+function parseStatusFilter(value: unknown): StatusFilter {
+  return value === "available" || value === "not_found" ? value : "all";
+}
+
 interface ResolvedRequest {
   feeds: FeedKey[];
   ids: string[];
+  statusFilter: StatusFilter;
 }
 
 type Resolution =
@@ -52,13 +59,20 @@ export async function resolveRequest(req: Request): Promise<Resolution> {
     };
   }
 
-  return { ok: true, data: { feeds: selectedFeeds, ids } };
+  const statusFilter = parseStatusFilter(
+    (body as { statusFilter?: unknown })?.statusFilter
+  );
+
+  return { ok: true, data: { feeds: selectedFeeds, ids, statusFilter } };
 }
 
 /** Resolve the request and run the feed comparison, sharing fetch caching. */
 export async function runSearch(
   req: Request
-): Promise<{ ok: true; result: SearchResult; feeds: FeedKey[] } | { ok: false; response: NextResponse }> {
+): Promise<
+  | { ok: true; result: SearchResult; feeds: FeedKey[]; statusFilter: StatusFilter }
+  | { ok: false; response: NextResponse }
+> {
   const resolved = await resolveRequest(req);
   if (!resolved.ok) return resolved;
 
@@ -68,6 +82,7 @@ export async function runSearch(
       ok: true,
       result: searchFeeds(resolved.data.ids, snapshots),
       feeds: resolved.data.feeds,
+      statusFilter: resolved.data.statusFilter,
     };
   } catch (err) {
     return {

@@ -221,6 +221,12 @@ table.dt tbody tr:hover {
   font-size: 11px;
 }
 
+/* Chart wrapper — controls canvas height (design.md) */
+.cw {
+  position: relative;
+  width: 100%;
+}
+
 /* Status text */
 .s-ok {
   color: var(--growth);

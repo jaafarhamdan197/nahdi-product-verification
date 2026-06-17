@@ -13,7 +13,13 @@ export async function POST(req: NextRequest) {
   const outcome = await runSearch(req);
   if (!outcome.ok) return outcome.response;
 
-  const { result, feeds } = outcome;
+  const { result, feeds, statusFilter } = outcome;
+  const scopeLabel =
+    statusFilter === "not_found"
+      ? "Not found only"
+      : statusFilter === "available"
+        ? "Available only"
+        : "All items";
 
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "Nahdi Product Verification";
@@ -47,6 +53,10 @@ export async function POST(req: NextRequest) {
     });
   }
   styleHeader(summarySheet);
+  // Note the export scope so a filtered file is self-documenting.
+  summarySheet.addRow({});
+  const scopeRow = summarySheet.addRow({ feed: `Export scope: ${scopeLabel}` });
+  scopeRow.getCell("feed").font = { italic: true, color: { argb: "FF777777" } };
 
   // --- One sheet per feed ---
   for (const feedKey of feeds) {
@@ -59,7 +69,12 @@ export async function POST(req: NextRequest) {
       { header: "Sale Price", key: "sale_price", width: 14 },
       { header: "Image Link", key: "image_link", width: 60 },
     ];
-    for (const row of result.rows.filter((r) => r.feed === feedKey)) {
+    const feedRows = result.rows.filter(
+      (r) =>
+        r.feed === feedKey &&
+        (statusFilter === "all" || r.status === statusFilter)
+    );
+    for (const row of feedRows) {
       const sheetRow = sheet.addRow({
         id: row.id,
         status: row.status === "available" ? "Available" : "Not Found",
@@ -96,7 +111,15 @@ export async function POST(req: NextRequest) {
   }
 
   const buffer = await workbook.xlsx.writeBuffer();
-  const filename = `nahdi-product-verification-${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const scopeSuffix =
+    statusFilter === "not_found"
+      ? "-not-found"
+      : statusFilter === "available"
+        ? "-available"
+        : "";
+  const filename = `nahdi-product-verification${scopeSuffix}-${new Date()
+    .toISOString()
+    .slice(0, 10)}.xlsx`;
 
   return new NextResponse(buffer, {
     headers: {
