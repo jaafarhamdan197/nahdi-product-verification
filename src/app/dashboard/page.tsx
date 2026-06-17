@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { signOut } from "@/auth";
 import { getSession } from "@/lib/session";
+import Header from "@/components/Header";
 import SearchTool from "@/components/SearchTool";
 
 export default async function DashboardPage() {
@@ -8,31 +9,38 @@ export default async function DashboardPage() {
   if (!session) redirect("/login");
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
-        <div>
-          <h1 className="text-lg font-semibold text-slate-900">
-            Nahdi Product Verification
-          </h1>
-          <p className="text-sm text-slate-500">
-            Signed in as {session.user?.email}
-          </p>
-        </div>
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/login" });
-          }}
-        >
-          <button
-            type="submit"
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
-          >
-            Sign out
-          </button>
-        </form>
-      </header>
-      <main className="px-6 py-8">
+    <div className="flex min-h-screen flex-col">
+      <Header
+        right={
+          <div className="flex items-center gap-3">
+            <span className="topbar-meta hidden sm:inline">
+              {session.user?.email}
+            </span>
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/login" });
+              }}
+            >
+              <button
+                type="submit"
+                className="rounded-md border border-white/25 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
+        }
+      />
+
+      <div className="border-b border-[var(--light-gray)] bg-white px-8 py-4">
+        <h1 className="sec-hdr">Product Verification</h1>
+        <p className="mt-1 text-xs text-[var(--mid-gray)]">
+          Check item availability across the Nahdi KSA &amp; UAE feeds.
+        </p>
+      </div>
+
+      <main className="flex-1 px-8 py-7">
         <SearchTool />
       </main>
     </div>

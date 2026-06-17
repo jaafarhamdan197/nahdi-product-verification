@@ -1,3 +1,4 @@
+import type { Session } from "next-auth";
 import { auth } from "@/auth";
 
 /**
@@ -15,14 +16,12 @@ export function devBypassEnabled(): boolean {
   );
 }
 
-type Session = Awaited<ReturnType<typeof auth>>;
-
-export async function getSession(): Promise<Session> {
+export async function getSession(): Promise<Session | null> {
   if (devBypassEnabled()) {
     return {
       user: { name: "Dev User", email: "dev@localhost" },
       expires: new Date(Date.now() + 86_400_000).toISOString(),
-    } as NonNullable<Session>;
+    };
   }
   return auth();
 }
