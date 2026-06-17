@@ -38,7 +38,7 @@ export default function Header({
           src="/logos/Initiative_agency_logo.png"
           alt="Initiative"
           className="brand-logo"
-          style={{ height: 26 }}
+          style={{ height: 42 }}
         />
       </div>
     </header>
