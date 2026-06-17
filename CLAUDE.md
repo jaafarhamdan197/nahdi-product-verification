@@ -5,7 +5,8 @@
 > **GitHub repo:** https://github.com/jaafarhamdan197/nahdi-product-verification
 > (public). Push to `main` with the `gh`-authenticated account
 > `jaafarhamdan197`. Never commit `.env.local` or real Channable feed URLs /
-> OAuth secrets — they are gitignored and live only locally and in Vercel.
+> OAuth secrets — they are gitignored and live only locally and in the host
+> (Cloud Run env vars / Secret Manager).
 
 Internal tool for verifying whether item IDs (pasted from Excel) are
 available in Nahdi's Channable product feeds.
@@ -53,8 +54,9 @@ simply re-fetched on a cold start.
 
 ## Architecture
 
-- **Next.js 16** (App Router, TypeScript, Tailwind), deployed on Vercel
-  from GitHub.
+- **Next.js 16** (App Router, TypeScript, Tailwind), `output: "standalone"`,
+  containerized via the root `Dockerfile` and deployed to **Google Cloud Run**
+  from GitHub (Cloud Build).
 - **Auth**: Auth.js / NextAuth v5 with the Google provider
   (`src/auth.ts`). Access control is primarily handled outside the app:
   the Google OAuth consent screen is kept in **Testing** publishing

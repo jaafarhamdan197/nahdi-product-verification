@@ -60,11 +60,24 @@ Optionally set `ALLOWED_EMAILS` (comma-separated) as a second layer of
 restriction enforced by the app itself, independent of the Cloud Console
 test user list.
 
-## Deployment (Vercel via GitHub)
+## Deployment (Google Cloud Run via GitHub)
+
+The app emits a standalone server (`output: "standalone"`) and is
+containerized via the root `Dockerfile`. Cloud Run builds and serves it.
 
 1. Push this repo to GitHub.
-2. Import the repo in Vercel.
-3. Add the same environment variables from `.env.local` in the Vercel
-   project settings (use the production domain for `NEXTAUTH_URL` and the
-   Google redirect URI).
-4. Add the production redirect URI to the Google OAuth client (step 3 above).
+2. Google Cloud Console → **Cloud Run** → **Create service** →
+   **Continuously deploy from a repository** → connect the GitHub repo
+   (`main` branch). Build type: **Dockerfile**.
+3. Set runtime environment variables on the service: `FEED_URL_AR`,
+   `FEED_URL_EN`, `FEED_URL_UAE`, `AUTH_SECRET`, `AUTH_GOOGLE_ID`,
+   `AUTH_GOOGLE_SECRET`, and `NEXTAUTH_URL` (the Cloud Run service URL).
+   Store `AUTH_GOOGLE_SECRET` / `AUTH_SECRET` via **Secret Manager** for
+   best security. Do **not** set `DEV_AUTH_BYPASS` (it is force-disabled in
+   production anyway).
+4. Allow unauthenticated invocations (the app does its own Google auth).
+5. Add `https://<cloud-run-url>/api/auth/callback/google` to the Google
+   OAuth client's Authorized redirect URIs.
+
+Cloud Run sets `PORT` (8080) and the container binds `0.0.0.0` — no extra
+config needed.
