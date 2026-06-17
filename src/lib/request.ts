@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/session";
+import { isEmailAllowed } from "@/auth";
+import { devBypassEnabled, getSession } from "@/lib/session";
 import { ALL_FEED_KEYS, FeedKey, getFeeds, isFeedKey } from "@/lib/feeds";
 import { parseIds, searchFeeds, SearchResult } from "@/lib/match";
 
@@ -29,6 +30,15 @@ export async function resolveRequest(req: Request): Promise<Resolution> {
     return {
       ok: false,
       response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+    };
+  }
+
+  // Re-check the allowlist on every API call so a since-removed user (whose
+  // JWT session is still valid) is blocked immediately, not at session expiry.
+  if (!devBypassEnabled() && !isEmailAllowed(session.user?.email)) {
+    return {
+      ok: false,
+      response: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
     };
   }
 
