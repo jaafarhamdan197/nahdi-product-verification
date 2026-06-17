@@ -58,14 +58,27 @@ simply re-fetched on a cold start.
   containerized via the root `Dockerfile` and deployed to **Google Cloud Run**
   from GitHub (Cloud Build).
 - **Auth**: Auth.js / NextAuth v5 with the Google provider
-  (`src/auth.ts`). Access control is primarily handled outside the app:
-  the Google OAuth consent screen is kept in **Testing** publishing
-  status, and only emails added as test users in Google Cloud Console can
-  sign in. An optional `ALLOWED_EMAILS` env var adds a second allowlist
-  layer enforced in the `signIn` callback.
+  (`src/auth.ts`). Two independent access-control layers:
+  1. The Google OAuth consent screen is kept in **Testing** publishing
+     status, so only emails added as test users in Google Cloud Console
+     can complete the OAuth login at all.
+  2. The `ALLOWED_EMAILS` env var (comma-separated) is the app's own
+     allowlist. When set, `isEmailAllowed()` is enforced in **three**
+     places — the `signIn` callback, the `authorized` proxy route guard,
+     and the API routes (`resolveRequest`) — so it is re-checked on every
+     request, not just at sign-in. Removing someone from `ALLOWED_EMAILS`
+     locks them out on their next request rather than at JWT expiry (~30d).
+     When the var is unset, access is open to any Google-authenticated
+     account (dev / pre-allowlist only). To grant a user access in
+     production they must be in **both** lists (test users *and*
+     `ALLOWED_EMAILS`).
 - **Route protection**: `src/proxy.ts` (Next.js 16 renamed the
-  `middleware.ts` convention to `proxy.ts`) guards `/dashboard`,
-  `/api/search`, and `/api/export`.
+  `middleware.ts` convention to `proxy.ts`) guards page routes via the
+  matcher `["/dashboard/:path*"]`. The API routes (`/api/search`,
+  `/api/export`) are intentionally NOT matched by the proxy — they
+  self-guard in `resolveRequest` (session + allowlist) and return a JSON
+  401/403, since a redirect to the HTML login page would break `fetch()`
+  callers' `res.json()` parsing on session expiry.
 - **Feed/match logic**: `src/lib/feeds.ts` (fetching, per-feed
   `Map<id, item>` lookups) and `src/lib/match.ts` (ID parsing, per-feed
   availability rows, cross-feed mismatch detection).
