@@ -2,6 +2,10 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // Auth.js only auto-trusts the host on Vercel. Behind any other reverse
+  // proxy (Cloud Run, etc.) it throws UntrustedHost — which surfaces as
+  // "There is a problem with the server configuration" — unless we opt in.
+  trustHost: true,
   providers: [Google],
   pages: {
     signIn: "/login",
