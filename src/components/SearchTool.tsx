@@ -284,26 +284,28 @@ export default function SearchTool() {
   return (
     <div className="grid gap-6 xl:grid-cols-[19rem_minmax(0,1fr)_22rem]">
       {/* ============ LEFT RAIL — charts ============ */}
-      <aside className="order-2 space-y-6 xl:order-none">
-        <section className="panel">
-          <div className="ph">
-            <h2>Availability</h2>
-            <span className="badge">{result.ids.length} items</span>
-          </div>
-          {totals && (
-            <AvailabilityDonut
-              available={totals.available}
-              notFound={totals.notFound}
-            />
-          )}
-        </section>
+      <aside className="order-2 xl:order-none">
+        <div className="space-y-6 xl:sticky xl:top-6">
+          <section className="panel">
+            <div className="ph">
+              <h2>Availability</h2>
+              <span className="badge">{result.ids.length} items</span>
+            </div>
+            {totals && (
+              <AvailabilityDonut
+                available={totals.available}
+                notFound={totals.notFound}
+              />
+            )}
+          </section>
 
-        <section className="panel">
-          <div className="ph">
-            <h2>By Feed</h2>
-          </div>
-          <PerFeedBar summary={result.summary} />
-        </section>
+          <section className="panel">
+            <div className="ph">
+              <h2>By Feed</h2>
+            </div>
+            <PerFeedBar summary={result.summary} />
+          </section>
+        </div>
       </aside>
 
       {/* ============ CENTER — query + summary + tables ============ */}
